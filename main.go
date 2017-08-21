@@ -14,8 +14,7 @@ func main() {
 	var (
 		app = kingpin.New("cf-ddns", "Cloudflare DynDNS Updater")
 
-		dummyIp        = app.Flag("dummy-ip", "Use a dummy IP service").Bool()
-		dummyIpAddress = app.Flag("dummy-ip-address", "Dummy address to set").String()
+		ipAddress = app.Flag("ip-address", "Skip resolving external IP and use provided IP").String()
 
 		cfEmail  = app.Flag("cf-email", "Cloudflare Email").Required().String()
 		cfApiKey = app.Flag("cf-api-key", "Cloudflare API key").Required().String()
@@ -29,12 +28,9 @@ func main() {
 	var dns *CFDNSUpdater
 	var err error
 
-	if *dummyIp {
-		if *dummyIpAddress == "" {
-			log.Panic("dummy-ip was specified without dummy-ip-address")
-		}
+	if *ipAddress != "" {
 		ip = &FakeIPService{
-			fakeIp: net.ParseIP(*dummyIpAddress),
+			fakeIp: net.ParseIP(*ipAddress),
 		}
 	} else {
 		ip = NewIpifyIPService()
