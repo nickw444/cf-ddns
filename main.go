@@ -6,6 +6,8 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"gopkg.in/alecthomas/kingpin.v2"
+	"net/http"
+	"crypto/tls"
 )
 
 var log = logrus.New()
@@ -15,6 +17,7 @@ func main() {
 		app = kingpin.New("cf-ddns", "Cloudflare DynDNS Updater")
 
 		ipAddress = app.Flag("ip-address", "Skip resolving external IP and use provided IP").String()
+		noVerify  = app.Flag("no-verify", "Don't verify ssl certificates").Bool()
 
 		cfEmail  = app.Flag("cf-email", "Cloudflare Email").Required().String()
 		cfApiKey = app.Flag("cf-api-key", "Cloudflare API key").Required().String()
@@ -33,7 +36,12 @@ func main() {
 			fakeIp: net.ParseIP(*ipAddress),
 		}
 	} else {
-		ip = NewIpifyIPService()
+		httpClient := &http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: *noVerify},
+			},
+		}
+		ip = &IpifyIPService{HttpClient: httpClient}
 	}
 
 	if dns, err = NewCFDNSUpdater(*cfZoneId, *cfApiKey, *cfEmail, log.WithField("component", "cf-dns-updater")); err != nil {

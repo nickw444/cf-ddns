@@ -11,6 +11,7 @@ Cloudflare DynDNS Updater
 Flags:
   --help                   Show context-sensitive help (also try --help-long and --help-man).
   --ip-address=IP-ADDRESS  Skip resolving external IP and use provided IP
+  --no-verify              Don't verify ssl certificates
   --cf-email=CF-EMAIL      Cloudflare Email
   --cf-api-key=CF-API-KEY  Cloudflare API key
   --cf-zone-id=CF-ZONE-ID  Cloudflare Zone ID

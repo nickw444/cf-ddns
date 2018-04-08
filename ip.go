@@ -23,13 +23,7 @@ func (f *FakeIPService) GetExternalIP() (net.IP, error) {
 }
 
 type IpifyIPService struct {
-	httpClient *http.Client
-}
-
-func NewIpifyIPService() *IpifyIPService {
-	return &IpifyIPService{
-		httpClient: &http.Client{},
-	}
+	HttpClient *http.Client
 }
 
 type IpifyAPIResponse struct {
@@ -37,7 +31,7 @@ type IpifyAPIResponse struct {
 }
 
 func (i *IpifyIPService) GetExternalIP() (net.IP, error) {
-	r, err := i.httpClient.Get("https://api.ipify.org?format=json")
+	r, err := i.HttpClient.Get("https://api.ipify.org?format=json")
 	if err != nil {
 		return nil, err
 	}
