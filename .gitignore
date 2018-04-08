@@ -1,2 +1,4 @@
 cf-ddns
-cf-ddns-mips64
+target/*
+vendor
+.idea/

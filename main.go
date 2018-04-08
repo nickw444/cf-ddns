@@ -11,10 +11,12 @@ import (
 )
 
 var log = logrus.New()
+var Version string
+
 
 func main() {
 	var (
-		app = kingpin.New("cf-ddns", "Cloudflare DynDNS Updater")
+		app = kingpin.New("cf-ddns", "Cloudflare DynDNS Updater").Version(Version)
 
 		ipAddress = app.Flag("ip-address", "Skip resolving external IP and use provided IP").String()
 		noVerify  = app.Flag("no-verify", "Don't verify ssl certificates").Bool()
