@@ -4,15 +4,14 @@ import (
 	"net"
 	"os"
 
+	"crypto/tls"
 	"github.com/Sirupsen/logrus"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"net/http"
-	"crypto/tls"
 )
 
 var log = logrus.New()
 var Version string
-
 
 func main() {
 	var (
@@ -21,9 +20,10 @@ func main() {
 		ipAddress = app.Flag("ip-address", "Skip resolving external IP and use provided IP").String()
 		noVerify  = app.Flag("no-verify", "Don't verify ssl certificates").Bool()
 
-		cfEmail  = app.Flag("cf-email", "Cloudflare Email").Required().String()
-		cfApiKey = app.Flag("cf-api-key", "Cloudflare API key").Required().String()
-		cfZoneId = app.Flag("cf-zone-id", "Cloudflare Zone ID").Required().String()
+		cfEmail   = app.Flag("cf-email", "Cloudflare Email").Required().String()
+		cfApiKey  = app.Flag("cf-api-key", "Cloudflare API key").Required().String()
+		cfZoneId  = app.Flag("cf-zone-id", "Cloudflare Zone ID").Required().String()
+		supportV6 = app.Flag("support-v6", "Whether IPv6 records should be updated/created").Bool()
 
 		hostnames = app.Arg("hostnames", "Hostnames to update").Required().Strings()
 	)
@@ -43,7 +43,7 @@ func main() {
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: *noVerify},
 			},
 		}
-		ip = &IpifyIPService{HttpClient: httpClient}
+		ip = &IpifyIPService{HttpClient: httpClient, supportV6: *supportV6}
 	}
 
 	if dns, err = NewCFDNSUpdater(*cfZoneId, *cfApiKey, *cfEmail, log.WithField("component", "cf-dns-updater")); err != nil {
@@ -56,9 +56,17 @@ func main() {
 	}
 
 	for _, hostname := range *hostnames {
-		err := dns.UpdateRecordA(hostname, res)
-		if err != nil {
-			log.Panic(err)
+		if res.v4 != nil {
+			err := dns.UpdateRecordA(hostname, res.v4)
+			if err != nil {
+				log.Panic(err)
+			}
+		}
+		if res.v6 != nil {
+			err := dns.UpdateRecordAAAA(hostname, res.v6)
+			if err != nil {
+				log.Panic(err)
+			}
 		}
 	}
 }

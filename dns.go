@@ -27,8 +27,17 @@ func NewCFDNSUpdater(zoneId string, apiKey string, apiEmail string, log *logrus.
 }
 
 func (c *CFDNSUpdater) UpdateRecordA(host string, ip net.IP) error {
+	return c.updateRecord("A", host, ip)
+}
+
+func (c *CFDNSUpdater) UpdateRecordAAAA(host string, ip net.IP) error {
 	// Fetch record IDs for the records we need to update.
-	records, err := c.cf.DNSRecords(c.zoneId, cloudflare.DNSRecord{Name: host, Type: "A"})
+	return c.updateRecord("AAAA", host, ip)
+}
+
+func (c *CFDNSUpdater) updateRecord(recordType string, host string, ip net.IP) error {
+	// Fetch record IDs for the records we need to update.
+	records, err := c.cf.DNSRecords(c.zoneId, cloudflare.DNSRecord{Name: host, Type: recordType})
 	if err != nil {
 		return err
 	}
