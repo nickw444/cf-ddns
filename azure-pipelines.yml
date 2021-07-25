@@ -64,3 +64,9 @@ steps:
     changeLogCompareToRelease: 'lastFullRelease'
     changeLogType: 'commitBased'
   condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: 'target/'
+    ArtifactName: 'build'
+    publishLocation: 'Container'
