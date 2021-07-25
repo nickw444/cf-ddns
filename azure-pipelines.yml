@@ -60,13 +60,13 @@ steps:
     action: 'create'
     target: '$(Build.SourceVersion)'
     tagSource: 'gitTag'
-    assets: 'target/*'
+    assets: '$(modulePath)/target/*'
     changeLogCompareToRelease: 'lastFullRelease'
     changeLogType: 'commitBased'
   condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
 
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: 'target/'
+    PathtoPublish: '$(modulePath)/target/'
     ArtifactName: 'build'
     publishLocation: 'Container'
