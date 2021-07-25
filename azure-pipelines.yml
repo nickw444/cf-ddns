@@ -39,11 +39,15 @@ steps:
     go mod download
   workingDirectory: '$(modulePath)'
   displayName: 'Get dependencies'
+  env:
+    GO111MODULE: 'on'
 
 - script: |
     bin/deploy-compile.sh
   workingDirectory: '$(modulePath)'
   displayName: 'Compile'
+  env:
+    GO111MODULE: 'on'
 
 - task: GitHubRelease@1
   inputs:
